@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Delete Your Account — EesyLoad</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0A0A0C;
+    color: #EDEDEF;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    line-height: 1.6;
+  }
+  h1 {
+    color: #FFFFFF;
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: #9A9AA2;
+    margin-bottom: 32px;
+    font-size: 15px;
+  }
+  h2 {
+    color: #FFFFFF;
+    font-size: 18px;
+    margin-top: 36px;
+    margin-bottom: 12px;
+  }
+  p, li {
+    color: #C9C9CE;
+    font-size: 15px;
+  }
+  ol, ul {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 10px;
+  }
+  a {
+    color: #BB2235;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .highlight {
+    background: #16161A;
+    border: 1px solid #26262C;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 20px 0;
+  }
+  .footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid #26262C;
+    color: #6E6E76;
+    font-size: 13px;
+  }
+
+  /* Form */
+  .del-form {
+    background: #16161A;
+    border: 1px solid #26262C;
+    border-radius: 10px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .del-form label {
+    display: block;
+    font-size: 13px;
+    color: #9A9AA2;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  .del-form label:first-child {
+    margin-top: 0;
+  }
+  .del-form input,
+  .del-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: #0A0A0C;
+    border: 1px solid #26262C;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #EDEDEF;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .del-form textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+  .del-form input:focus,
+  .del-form textarea:focus {
+    outline: none;
+    border-color: #BB2235;
+  }
+  .del-submit {
+    margin-top: 20px;
+    width: 100%;
+    background: #BB2235;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .del-submit:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .del-msg {
+    margin-top: 14px;
+    font-size: 14px;
+    display: none;
+  }
+  .del-msg.ok {
+    color: #4ADE80;
+    display: block;
+  }
+  .del-msg.err {
+    color: #F87171;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Delete Your EesyLoad Account</h1>
+  <p class="subtitle">EesyLoad — Maobane Innovations</p>
+
+  <p>
+    Use the form below to request deletion of your EesyLoad rider or driver account,
+    and what happens to your data when you do.
+  </p>
+
+  <h2>Request account deletion</h2>
+
+  <form class="del-form" id="delForm">
+    <label for="delPhone">Registered phone number *</label>
+    <input type="tel" id="delPhone" required placeholder="e.g. 0821234567" />
+
+    <label for="delEmail">Registered email (if you have one)</label>
+    <input type="email" id="delEmail" placeholder="you@example.com" />
+
+    <label for="delReason">Reason (optional)</label>
+    <textarea id="delReason" placeholder="Let us know why you're leaving — optional"></textarea>
+
+    <button type="submit" class="del-submit" id="delSubmitBtn">Request Account Deletion</button>
+
+    <div class="del-msg" id="delMsg"></div>
+  </form>
+
+  <div class="highlight">
+    <strong>What happens next:</strong> We verify your identity against the phone number
+    or email you submit, and confirm your request within 48 hours. Your account and
+    associated data are then deleted within 14 days of confirmation. We may contact you
+    at the phone number or email you provide to verify the request.
+  </div>
+
+  <h2>What data is deleted</h2>
+  <ul>
+    <li>Your profile information (name, phone number, email, avatar)</li>
+    <li>Saved addresses and preferences</li>
+    <li>In-app chat messages</li>
+    <li>Delivery photos and signatures associated with your account</li>
+    <li>Authentication credentials</li>
+  </ul>
+
+  <h2>What data is retained, and why</h2>
+  <ul>
+    <li>
+      <strong>Transaction and booking records</strong> may be retained in an anonymised or
+      de-identified form for up to 5 years, as required for financial record-keeping,
+      tax compliance, and fraud prevention under applicable South African law.
+    </li>
+    <li>
+      <strong>Safety and support logs</strong> (e.g. SOS alerts) may be retained for up to
+      12 months where necessary for safety investigations or legal obligations.
+    </li>
+  </ul>
+
+  <p>
+    Once the retention period ends, this data is permanently deleted or fully anonymised
+    so it can no longer be linked back to you.
+  </p>
+
+  <div class="footer">
+    EesyLoad is operated by Maobane Innovations, South Africa.
+    Questions about this process can be sent to
+    <a href="mailto:support@eesyload.com">support@eesyload.com</a>.
+  </div>
+
+<script>
+(function () {
+  var SUPABASE_URL = "https://mbtqqnbklcltrtwlpduq.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1idHFxbmJrbGNsdHJ0d2xwZHVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3OTE4NjcsImV4cCI6MjA5OTM2Nzg2N30.uOyht5WlXkhhH9mkWQZ5GhORjbWntaYf0yX45lV8tWQ";
+
+  var form = document.getElementById("delForm");
+  var btn = document.getElementById("delSubmitBtn");
+  var msg = document.getElementById("delMsg");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    var phone = document.getElementById("delPhone").value.trim();
+    var email = document.getElementById("delEmail").value.trim();
+    var reason = document.getElementById("delReason").value.trim();
+
+    if (!phone) {
+      msg.className = "del-msg err";
+      msg.textContent = "Please enter your registered phone number.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Submitting…";
+    msg.className = "del-msg";
+    msg.textContent = "";
+
+    fetch(SUPABASE_URL + "/rest/v1/account_deletion_requests", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        phone: phone,
+        email: email || null,
+        reason: reason || null
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Request failed (" + res.status + ")");
+        form.reset();
+        msg.className = "del-msg ok";
+        msg.textContent = "Request received. We'll confirm within 48 hours by phone or email.";
+        btn.textContent = "Request Account Deletion";
+        btn.disabled = false;
+      })
+      .catch(function (err) {
+        msg.className = "del-msg err";
+        msg.textContent = "Something went wrong submitting your request. Please email support@eesyload.com instead.";
+        btn.textContent = "Request Account Deletion";
+        btn.disabled = false;
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
