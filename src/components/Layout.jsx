@@ -9,6 +9,7 @@ const NAV = [
   { to: '/drivers', label: 'Drivers', icon: '🚚', roles: null },
   { to: '/riders', label: 'Users', icon: '◍', roles: null },
   { to: '/pricing', label: 'Pricing', icon: '₦', roles: ['owner', 'finance'] },
+  { to: '/payment-methods', label: 'Payment Methods', icon: '💳', roles: ['owner', 'finance'] },
   { to: '/addons', label: 'Add-ons', icon: '+', roles: ['owner', 'finance'] },
   { to: '/commission', label: 'Commission', icon: '%', roles: ['owner', 'finance'] },
   { to: '/promotions', label: 'Promotions', icon: '★', roles: ['owner', 'finance'] },

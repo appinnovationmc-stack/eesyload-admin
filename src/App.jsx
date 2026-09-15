@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import PricingConfig from './pages/PricingConfig'
+import PaymentMethods from './pages/PaymentMethods'
 import Addons from './pages/Addons'
 import CommissionRules from './pages/CommissionRules'
 import Payouts from './pages/Payouts'
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/drivers" element={<Page><Drivers /></Page>} />
           <Route path="/live-ops" element={<Page><LiveOps /></Page>} />
           <Route path="/pricing" element={<Page><PricingConfig /></Page>} />
+          <Route path="/payment-methods" element={<Page><PaymentMethods /></Page>} />
           <Route path="/addons" element={<Page><Addons /></Page>} />
           <Route path="/commission" element={<Page><CommissionRules /></Page>} />
           <Route path="/payouts" element={<Page><Payouts /></Page>} />
