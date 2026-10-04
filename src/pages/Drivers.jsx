@@ -20,7 +20,7 @@ export default function Drivers() {
     setLoading(true)
     let query = supabase
       .from('profiles')
-      .select('id, full_name, phone, avatar_url, vehicle_type, vehicle_plate, driver_rating, driver_status, is_online, created_at')
+      .select('id, full_name, phone, avatar_url, vehicle_photo_url, vehicle_type, vehicle_plate, driver_rating, driver_status, is_online, created_at')
       .not('driver_status', 'is', null)
       .order('created_at', { ascending: false })
       .limit(200)
@@ -130,12 +130,29 @@ export default function Drivers() {
                         {isFinance && (
                           <div className="driver-detail-actions">
                             <span className="detail-label">Driver status:</span>
-                            <button className="btn-small btn-approve" disabled={savingDriver || d.driver_status === 'active'} onClick={() => setDriverStatus(d.id, 'active')}>Approve</button>
+                            <button className="btn-small btn-approve" disabled={savingDriver || d.driver_status === 'active' || d.driver_status === 'incomplete'} onClick={() => setDriverStatus(d.id, 'active')}>Approve</button>
                             <button className="btn-small" disabled={savingDriver || d.driver_status === 'suspended'} onClick={() => setDriverStatus(d.id, 'suspended')}>Suspend</button>
                             <button className="btn-small btn-danger" disabled={savingDriver || d.driver_status === 'rejected'} onClick={() => setDriverStatus(d.id, 'rejected')}>Reject</button>
                             <button className="btn-small btn-danger" disabled={savingDriver || d.driver_status === 'banned'} onClick={() => setDriverStatus(d.id, 'banned')}>Ban</button>
                           </div>
                         )}
+
+                        <div className="detail-label" style={{ marginTop: 14 }}>Photos</div>
+                        <div className="doc-grid">
+                          {d.avatar_url && (
+                            <div className="doc-card">
+                              <a href={d.avatar_url} target="_blank" rel="noreferrer" className="doc-preview"><img src={d.avatar_url} alt="Profile photo" /></a>
+                              <div className="doc-info"><div className="doc-type">Profile photo</div></div>
+                            </div>
+                          )}
+                          {d.vehicle_photo_url && (
+                            <div className="doc-card">
+                              <a href={d.vehicle_photo_url} target="_blank" rel="noreferrer" className="doc-preview"><img src={d.vehicle_photo_url} alt="Vehicle photo" /></a>
+                              <div className="doc-info"><div className="doc-type">Vehicle photo</div></div>
+                            </div>
+                          )}
+                          {!d.avatar_url && !d.vehicle_photo_url && <p className="empty-state">No photos uploaded yet.</p>}
+                        </div>
 
                         <div className="detail-label" style={{ marginTop: 14 }}>Documents</div>
                         {docsLoading ? (
