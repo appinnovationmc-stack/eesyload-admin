@@ -121,6 +121,7 @@ body {
 .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600; text-transform: capitalize; }
 .badge-pending { background: var(--ylw-light); color: #8A6116; }
 .badge-pending_review { background: var(--ylw-light); color: #8A6116; }
+.badge-incomplete { background: #E5E7EB; color: #4B5563; }
 .badge-paid, .badge-active, .badge-approved, .badge-online { background: var(--grn-light); color: var(--grn); }
 .badge-failed, .badge-suspended, .badge-rejected, .badge-banned { background: var(--red-light); color: var(--red); }
 .badge-info, .badge-offline { background: var(--blu-light); color: var(--blu); }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
-const STATUS_TABS = ['pending_review', 'active', 'suspended', 'rejected', 'all']
+const STATUS_TABS = ['pending_review', 'incomplete', 'active', 'suspended', 'rejected', 'all']
 
 export default function Drivers() {
   const { isFinance, session } = useAuth()
@@ -156,7 +156,7 @@ export default function Drivers() {
                                   )}
                                 </a>
                                 <div className="doc-info">
-                                  <div className="doc-type capitalize">{doc.doc_type?.replaceAll('_', ' ')}</div>
+                                  <div className="doc-type capitalize">{({id_document:'ID or passport',background_check:'Criminal record check',license:"Driver's licence",vehicle_registration:'Vehicle registration',insurance:'Vehicle insurance'})[doc.doc_type] || doc.doc_type?.replaceAll('_', ' ')}</div>
                                   <span className={'badge badge-' + doc.status}>{doc.status}</span>
                                 </div>
                                 {isFinance && doc.status === 'pending' && (
