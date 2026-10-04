@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { logAdminAction } from '../lib/audit'
 
-const STATUS_TABS = ['all', 'pending', 'accepted', 'en_route', 'delivered', 'cancelled']
+const STATUS_TABS = ['all', 'pending', 'accepted', 'loading', 'in_transit', 'delivered', 'cancelled']
 
 export default function Trips() {
   const { isFinance, adminUser } = useAuth()
@@ -36,20 +36,12 @@ export default function Trips() {
     )
   })
 
-  async function overrideStatus(id, status) {
-    if (!confirm(`Set booking status to "${status}"? This is a manual override.`)) return
-    const { error } = await supabase.from('bookings').update({ status }).eq('id', id)
-    if (error) return alert(error.message)
-    await logAdminAction({ adminId: adminUser?.id, action: 'booking_status_override', targetTable: 'bookings', targetId: id, detail: { status } })
-    load()
-    setSelected(null)
-  }
 
   return (
     <div>
       <header className="page-header">
         <h1>Trips</h1>
-        <p>Search and manage every booking. Manual status overrides are logged to the audit trail.</p>
+        <p>Search and view every booking.</p>
       </header>
 
       <div className="filter-tabs">
@@ -102,16 +94,6 @@ export default function Trips() {
                             </div>
                           ))}
                         </div>
-                        {isFinance && (
-                          <div className="driver-detail-actions" style={{ marginTop: 14 }}>
-                            <span className="detail-label">Override status:</span>
-                            {['pending', 'accepted', 'en_route', 'delivered', 'cancelled'].map(s => (
-                              <button key={s} className="btn-small" disabled={row.status === s} onClick={() => overrideStatus(row.id, s)}>
-                                {s.replaceAll('_', ' ')}
-                              </button>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </td>
                   </tr>
