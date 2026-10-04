@@ -33,7 +33,7 @@ export default function Riders() {
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
-      .or(`rider_id.eq.${user.id},user_id.eq.${user.id},customer_id.eq.${user.id}`)
+      .eq('rider_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50)
     if (error) console.warn('history lookup — booking rider column may differ:', error.message)
