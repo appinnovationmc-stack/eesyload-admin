@@ -186,7 +186,7 @@ export default function PaymentMethods() {
                   title={method.enabled ? 'Disable' : 'Enable'}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${\n                      method.enabled ? 'translate-x-6' : 'translate-x-1'
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${                      method.enabled ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
                 </button>
