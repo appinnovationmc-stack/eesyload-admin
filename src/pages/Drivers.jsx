@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
-const STATUS_TABS = ['pending_review', 'incomplete', 'active', 'suspended', 'rejected', 'all']
+const STATUS_TABS = ['pending_review', 'incomplete', 'active', 'suspended', 'rejected', 'banned', 'all']
 
 export default function Drivers() {
   const { isFinance, session } = useAuth()
@@ -21,6 +21,7 @@ export default function Drivers() {
     let query = supabase
       .from('profiles')
       .select('id, full_name, phone, avatar_url, vehicle_photo_url, vehicle_type, vehicle_plate, driver_rating, driver_status, is_online, created_at')
+      .eq('role', 'driver')
       .not('driver_status', 'is', null)
       .order('created_at', { ascending: false })
       .limit(200)
@@ -35,7 +36,7 @@ export default function Drivers() {
     const marker = '/driver-documents/'
     const idx = (fileUrl || '').indexOf(marker)
     if (idx === -1) return null
-    return fileUrl.slice(idx + marker.length)
+    return decodeURIComponent(fileUrl.slice(idx + marker.length).split('?')[0])
   }
 
   async function selectDriver(id) {
@@ -164,7 +165,7 @@ export default function Drivers() {
                             {docs.map(doc => (
                               <div key={doc.id} className="doc-card">
                                 <a href={doc.signedUrl || '#'} target="_blank" rel="noreferrer" className="doc-preview">
-                                  {doc.signedUrl && /\.(jpg|jpeg|png|webp)$/i.test(doc.file_url || '') ? (
+                                  {doc.signedUrl && /\.(jpg|jpeg|png|webp)$/i.test(getStoragePath(doc.file_url) || '') ? (
                                     <img src={doc.signedUrl} alt={doc.doc_type} />
                                   ) : doc.signedUrl ? (
                                     <span className="doc-file-icon">📄</span>

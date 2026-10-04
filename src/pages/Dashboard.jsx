@@ -23,7 +23,7 @@ export default function Dashboard() {
           .order('created_at', { ascending: false }).limit(6),
         supabase.from('vehicle_types').select('id', { count: 'exact', head: true }).eq('active', true),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_online', true),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('driver_status', 'pending_review'),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'driver').eq('driver_status', 'pending_review'),
         supabase.from('bookings').select('created_at, total_fare, status')
           .gte('created_at', new Date(Date.now() - 29 * 86400000).toISOString()),
       ])
@@ -42,7 +42,7 @@ export default function Dashboard() {
           byDay[key].trips += 1
           byDay[key].gmv += Number(b.total_fare || 0)
         }
-        if (b.status === 'cancelled') cancelled += 1
+        if (String(b.status || '').startsWith('cancelled')) cancelled += 1
       })
       const series = Object.values(byDay)
       const totalTrips30 = (last30 || []).length
