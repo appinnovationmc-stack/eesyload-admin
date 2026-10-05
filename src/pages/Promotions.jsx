@@ -33,7 +33,6 @@ export default function Promotions() {
       discount_value: Number(form.discount_value),
       max_uses: form.max_uses ? Number(form.max_uses) : null,
       expires_at: form.expires_at || null,
-      created_by: adminUser?.id,
     })
     setSaving(false)
     if (error) { setError(error.message); return }
@@ -62,11 +61,15 @@ export default function Promotions() {
     <div>
       <header className="page-header">
         <h1>Promotions</h1>
-        <p>Coupon codes and ride credits. Requires the Phase 2 migration (<span className="mono">promo_codes</span> table).</p>
+        <p>Coupon codes riders can apply at booking.</p>
         {isFinance && (
           <button className="btn-primary" onClick={() => setShowForm(s => !s)}>{showForm ? 'Cancel' : '+ New promo code'}</button>
         )}
       </header>
+
+      <div className="notice">
+        Heads up: promo codes are stored here but are not applied at booking yet — the booking function does not read this table, so riders get no discount. Treat these as a list until that is built.
+      </div>
 
       {showForm && (
         <form className="panel form-panel" onSubmit={createPromo}>

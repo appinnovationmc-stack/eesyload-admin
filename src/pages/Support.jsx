@@ -8,6 +8,7 @@ const STATUS_TABS = ['open', 'in_progress', 'resolved', 'closed', 'all']
 export default function Support() {
   const { adminUser } = useAuth()
   const [rows, setRows] = useState([])
+  const [people, setPeople] = useState({})
   const [filter, setFilter] = useState('open')
   const [loading, setLoading] = useState(true)
 
@@ -19,7 +20,15 @@ export default function Support() {
     if (filter !== 'all') query = query.eq('status', filter)
     const { data, error } = await query
     if (error) console.error(error)
-    setRows(data || [])
+    const list = data || []
+    const ids = [...new Set(list.map(t => t.user_id).filter(Boolean))]
+    const map = {}
+    if (ids.length) {
+      const { data: profs } = await supabase.from('profiles').select('id, full_name, phone, role').in('id', ids)
+      for (const p of profs || []) map[p.id] = p
+    }
+    setPeople(map)
+    setRows(list)
     setLoading(false)
   }
 
@@ -36,7 +45,7 @@ export default function Support() {
     <div>
       <header className="page-header">
         <h1>Support</h1>
-        <p>Ticket queue. Requires the Phase 2 migration (<span className="mono">support_tickets</span> table).</p>
+        <p>Tickets raised from the rider and driver apps. Contact the person on the phone number shown, then move the ticket along.</p>
       </header>
 
       <div className="filter-tabs">
@@ -54,7 +63,7 @@ export default function Support() {
       ) : (
         <table className="data-table">
           <thead>
-            <tr><th>Subject</th><th>Priority</th><th>Created</th><th>Status</th><th></th></tr>
+            <tr><th>Subject</th><th>From</th><th>Priority</th><th>Created</th><th>Status</th><th></th></tr>
           </thead>
           <tbody>
             {rows.map(t => (
@@ -62,6 +71,11 @@ export default function Support() {
                 <td>
                   <div style={{ fontWeight: 500 }}>{t.subject}</div>
                   {t.message && <div style={{ fontSize: 12.5, color: 'var(--text-dim)', marginTop: 2, maxWidth: 420 }}>{t.message}</div>}
+                </td>
+                <td>
+                  <div>{people[t.user_id]?.full_name || 'Unknown'}{people[t.user_id]?.role ? <span style={{ color: 'var(--text-dim)', fontSize: 12 }}> · {people[t.user_id].role}</span> : null}</div>
+                  {people[t.user_id]?.phone && <div className="mono small">{people[t.user_id].phone}</div>}
+                  {t.booking_id && <div className="mono small" style={{ color: 'var(--text-dim)' }}>Trip {String(t.booking_id).slice(0, 8)}</div>}
                 </td>
                 <td><span className={'badge ' + (t.priority === 'urgent' || t.priority === 'high' ? 'badge-failed' : 'badge-pending')}>{t.priority}</span></td>
                 <td className="mono">{t.created_at ? new Date(t.created_at).toLocaleString() : '—'}</td>

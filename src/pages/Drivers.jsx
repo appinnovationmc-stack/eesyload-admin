@@ -1,8 +1,38 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 const STATUS_TABS = ['pending_review', 'incomplete', 'active', 'suspended', 'rejected', 'banned', 'all']
+
+// Mirrors the database rule that blocks approval (enforce_active_requires_documents):
+// every document below must have an approved latest upload, plus a profile photo and a vehicle photo.
+const REQUIRED_DOCS = [
+  { type: 'license', label: "Driver's licence", alias: [] },
+  { type: 'vehicle_registration', label: 'Vehicle registration', alias: [] },
+  { type: 'insurance', label: 'Vehicle insurance', alias: [] },
+  { type: 'id_document', label: 'ID or passport', alias: ['identity'] },
+  { type: 'background_check', label: 'Criminal record check', alias: [] },
+]
+const DOC_LABELS = {
+  id_document: 'ID or passport',
+  identity: 'ID or passport',
+  background_check: 'Criminal record check',
+  license: "Driver's licence",
+  vehicle_registration: 'Vehicle registration',
+  insurance: 'Vehicle insurance',
+  pdp_certificate: 'PrDP certificate',
+}
+
+function approvalChecklist(driver, docs) {
+  const items = REQUIRED_DOCS.map(r => {
+    const latest = docs.find(d => d.doc_type === r.type || r.alias.includes(d.doc_type))
+    const status = latest ? latest.status : 'missing'
+    return { label: r.label, ok: status === 'approved', status }
+  })
+  items.push({ label: 'Profile photo', ok: !!driver.avatar_url, status: driver.avatar_url ? 'approved' : 'missing' })
+  items.push({ label: 'Vehicle photo', ok: !!driver.vehicle_photo_url, status: driver.vehicle_photo_url ? 'approved' : 'missing' })
+  return items
+}
 
 export default function Drivers() {
   const { isFinance, session } = useAuth()
@@ -109,8 +139,8 @@ export default function Drivers() {
           </thead>
           <tbody>
             {drivers.map(d => (
-              <>
-                <tr key={d.id} className="clickable-row" onClick={() => selectDriver(d.id)}>
+              <Fragment key={d.id}>
+                <tr className="clickable-row" onClick={() => selectDriver(d.id)}>
                   <td>
                     <div className="avatar-sm">
                       {d.avatar_url ? <img src={d.avatar_url} alt="" /> : (d.full_name?.[0]?.toUpperCase() || '?')}
@@ -125,7 +155,7 @@ export default function Drivers() {
                   <td className="mono">{d.created_at ? new Date(d.created_at).toLocaleDateString() : '—'}</td>
                 </tr>
                 {selectedId === d.id && (
-                  <tr key={d.id + '-detail'}>
+                  <tr>
                     <td colSpan={8} className="detail-cell">
                       <div className="driver-detail">
                         {isFinance && (
@@ -136,6 +166,29 @@ export default function Drivers() {
                             <button className="btn-small btn-danger" disabled={savingDriver || d.driver_status === 'rejected'} onClick={() => setDriverStatus(d.id, 'rejected')}>Reject</button>
                             <button className="btn-small btn-danger" disabled={savingDriver || d.driver_status === 'banned'} onClick={() => setDriverStatus(d.id, 'banned')}>Ban</button>
                           </div>
+                        )}
+
+                        {d.driver_status !== 'active' && !docsLoading && (
+                          <>
+                            <div className="detail-label" style={{ marginTop: 14 }}>Approval checklist</div>
+                            <div className="kv-grid">
+                              {approvalChecklist(d, docs).map(item => (
+                                <div key={item.label} className="kv-row">
+                                  <span className="kv-k">{item.label}</span>
+                                  <span className="kv-v">
+                                    <span className={'badge ' + (item.ok ? 'badge-approved' : item.status === 'pending' ? 'badge-pending' : 'badge-failed')}>
+                                      {item.ok ? 'OK' : item.status}
+                                    </span>
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            {approvalChecklist(d, docs).some(i => !i.ok) && (
+                              <p className="small" style={{ color: 'var(--text-dim)', marginTop: 6 }}>
+                                The database will refuse to approve this driver until every item above is OK.
+                              </p>
+                            )}
+                          </>
                         )}
 
                         <div className="detail-label" style={{ marginTop: 14 }}>Photos</div>
@@ -174,7 +227,7 @@ export default function Drivers() {
                                   )}
                                 </a>
                                 <div className="doc-info">
-                                  <div className="doc-type capitalize">{({id_document:'ID or passport',background_check:'Criminal record check',license:"Driver's licence",vehicle_registration:'Vehicle registration',insurance:'Vehicle insurance'})[doc.doc_type] || doc.doc_type?.replaceAll('_', ' ')}</div>
+                                  <div className="doc-type capitalize">{DOC_LABELS[doc.doc_type] || doc.doc_type?.replaceAll('_', ' ')}</div>
                                   <span className={'badge badge-' + doc.status}>{doc.status}</span>
                                 </div>
                                 {isFinance && doc.status === 'pending' && (
@@ -191,7 +244,7 @@ export default function Drivers() {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

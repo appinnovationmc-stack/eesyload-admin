@@ -1,3 +1,4 @@
+import { vehicleLabel } from '../vehicleLabel'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -181,7 +182,7 @@ export default function Payouts() {
               <tr key={row.id}>
                 <td className="mono">{row.delivered_at ? new Date(row.delivered_at).toLocaleDateString() : '—'}</td>
                 <td>{driverLabel(row.driver_id)}</td>
-                <td>{row.vehicle_name}</td>
+                <td>{vehicleLabel(row.vehicle_name)}</td>
                 <td className="mono">R{row.total_fare}</td>
                 <td className="mono">R{row.commission_amount ?? '—'}</td>
                 <td className="mono">R{row.driver_payout ?? '—'}</td>

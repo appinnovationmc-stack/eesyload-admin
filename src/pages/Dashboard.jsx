@@ -1,4 +1,6 @@
+import { vehicleLabel } from '../vehicleLabel'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -10,14 +12,20 @@ export default function Dashboard() {
     async function load() {
       const [
         { count: pendingCount },
+        { count: sosOpen },
+        { count: deletionOpen },
+        { data: cashOwed },
         { data: recent },
         { count: activeVehicleTypes },
         { count: onlineDrivers },
         { count: pendingDrivers },
         { data: last30 },
       ] = await Promise.all([
-        supabase.from('bookings').select('id', { count: 'exact', head: true })
-          .eq('status', 'delivered').eq('payout_status', 'pending'),
+        supabase.from('payout_requests').select('id', { count: 'exact', head: true })
+          .in('status', ['pending', 'approved']),
+        supabase.from('sos_alerts').select('id', { count: 'exact', head: true }).is('resolved_at', null),
+        supabase.from('account_deletion_requests').select('id', { count: 'exact', head: true }).in('status', ['pending', 'confirmed']),
+        supabase.from('driver_cash_commission_owed').select('commission_owed'),
         supabase.from('bookings')
           .select('id, vehicle_name, total_fare, commission_amount, driver_payout, payout_status, status, created_at')
           .order('created_at', { ascending: false }).limit(6),
@@ -40,17 +48,23 @@ export default function Dashboard() {
         const key = (b.created_at || '').slice(0, 10)
         if (byDay[key]) {
           byDay[key].trips += 1
-          byDay[key].gmv += Number(b.total_fare || 0)
+          if (b.status === 'delivered') byDay[key].gmv += Number(b.total_fare || 0)
         }
         if (String(b.status || '').startsWith('cancelled')) cancelled += 1
       })
       const series = Object.values(byDay)
       const totalTrips30 = (last30 || []).length
       const cancellationRate = totalTrips30 ? ((cancelled / totalTrips30) * 100).toFixed(1) : '0.0'
-      const gmv30 = (last30 || []).reduce((sum, b) => sum + Number(b.total_fare || 0), 0)
+      const gmv30 = (last30 || [])
+        .filter(b => b.status === 'delivered')
+        .reduce((sum, b) => sum + Number(b.total_fare || 0), 0)
+      const cashOwedTotal = (cashOwed || []).reduce((sum, r) => sum + Number(r.commission_owed || 0), 0)
 
       setStats({
         pendingCount: pendingCount ?? 0,
+        sosOpen: sosOpen ?? 0,
+        deletionOpen: deletionOpen ?? 0,
+        cashOwedTotal,
         recent: recent ?? [],
         activeVehicleTypes: activeVehicleTypes ?? 0,
         onlineDrivers: onlineDrivers ?? 0,
@@ -85,12 +99,24 @@ export default function Dashboard() {
               <div className="stat-label">Pending driver approvals</div>
               <div className="stat-value mono">{stats.pendingDrivers}</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-label">Pending payouts</div>
+            <Link to="/payouts" className="stat-card stat-link">
+              <div className="stat-label">Open payout requests</div>
               <div className="stat-value mono">{stats.pendingCount}</div>
-            </div>
+            </Link>
+            <Link to="/sos" className={'stat-card stat-link' + (stats.sosOpen > 0 ? ' stat-alert' : '')}>
+              <div className="stat-label">Open SOS alerts</div>
+              <div className="stat-value mono">{stats.sosOpen}</div>
+            </Link>
+            <Link to="/deletion-requests" className="stat-card stat-link">
+              <div className="stat-label">Open deletion requests</div>
+              <div className="stat-value mono">{stats.deletionOpen}</div>
+            </Link>
+            <Link to="/cash-commission" className="stat-card stat-link">
+              <div className="stat-label">Cash commission owed</div>
+              <div className="stat-value mono">R{stats.cashOwedTotal.toFixed(0)}</div>
+            </Link>
             <div className="stat-card">
-              <div className="stat-label">GMV (30d)</div>
+              <div className="stat-label">GMV (30d, delivered)</div>
               <div className="stat-value mono">R{stats.gmv30.toFixed(0)}</div>
             </div>
             <div className="stat-card">
@@ -104,7 +130,7 @@ export default function Dashboard() {
           </div>
 
           <section className="panel">
-            <h2>Trips &amp; GMV — last 30 days</h2>
+            <h2>Trips &amp; delivered GMV — last 30 days</h2>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={stats.series}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
@@ -132,7 +158,7 @@ export default function Dashboard() {
                 <tbody>
                   {stats.recent.map(row => (
                     <tr key={row.id}>
-                      <td>{row.vehicle_name}</td>
+                      <td>{vehicleLabel(row.vehicle_name)}</td>
                       <td className="capitalize">{row.status}</td>
                       <td className="mono">R{row.total_fare}</td>
                       <td className="mono">{row.commission_amount != null ? `R${row.commission_amount}` : '—'}</td>

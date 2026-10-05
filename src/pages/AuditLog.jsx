@@ -23,7 +23,7 @@ export default function AuditLog() {
     <div>
       <header className="page-header">
         <h1>Audit Log</h1>
-        <p>Every admin write action, logged automatically. Requires the Phase 2 migration (<span className="mono">admin_audit_log</span> table).</p>
+        <p>Every admin change to pricing, add-ons, load tiers, payment methods, driver status, document reviews, payouts, SOS and deletion requests, dispatch settings, promos, tickets and team — recorded by the database.</p>
       </header>
 
       {loading ? (
@@ -40,7 +40,7 @@ export default function AuditLog() {
               <tr key={r.id}>
                 <td className="mono">{new Date(r.created_at).toLocaleString()}</td>
                 <td>{r.admin_users?.email || r.admin_id?.slice(0, 8) || '—'}</td>
-                <td>{r.action}</td>
+                <td>{r.action.replaceAll('_', ' ')}</td>
                 <td className="mono small">{r.target_table}{r.target_id ? ` · ${String(r.target_id).slice(0, 8)}` : ''}</td>
                 <td className="mono small">{r.detail ? JSON.stringify(r.detail) : '—'}</td>
               </tr>

@@ -1,3 +1,4 @@
+import { vehicleLabel } from '../vehicleLabel'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
@@ -18,7 +19,7 @@ export default function Riders() {
     setLoading(true)
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, phone, avatar_url, role, driver_status, created_at')
+      .select('id, full_name, phone, avatar_url, role, created_at')
       .or(`full_name.ilike.%${search}%,phone.ilike.%${search}%`)
       .limit(50)
     if (error) console.error(error)
@@ -29,14 +30,14 @@ export default function Riders() {
   async function viewHistory(user) {
     setSelected(user)
     setHistoryLoading(true)
-    // Bookings don't have a documented rider_id column here, so we try common ones defensively.
+    const column = user.role === 'driver' ? 'driver_id' : 'rider_id'
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
-      .eq('rider_id', user.id)
+      .eq(column, user.id)
       .order('created_at', { ascending: false })
       .limit(50)
-    if (error) console.warn('history lookup — booking rider column may differ:', error.message)
+    if (error) console.warn('history lookup failed:', error.message)
     setHistory(data || [])
     setHistoryLoading(false)
   }
@@ -77,7 +78,7 @@ export default function Riders() {
                 </td>
                 <td>{u.full_name || 'Unnamed'}</td>
                 <td className="mono">{u.phone || '—'}</td>
-                <td className="capitalize">{u.driver_status ? 'driver' : (u.role || 'rider')}</td>
+                <td className="capitalize">{u.role || 'rider'}</td>
                 <td className="mono">{u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
               </tr>
             ))}
@@ -91,19 +92,20 @@ export default function Riders() {
           {historyLoading ? (
             <div className="page-loading">Loading…</div>
           ) : history.length === 0 ? (
-            <p className="empty-state">No bookings found for this user (or the rider-id column on bookings has a different name — tell me the exact column and I'll wire it up).</p>
+            <p className="empty-state">No bookings found for this user.</p>
           ) : (
             <table className="data-table">
               <thead>
-                <tr><th>Created</th><th>Vehicle</th><th>Fare</th><th>Status</th></tr>
+                <tr><th>Created</th><th>Vehicle</th><th>Fare</th><th>Paid by</th><th>Status</th></tr>
               </thead>
               <tbody>
                 {history.map(b => (
                   <tr key={b.id}>
                     <td className="mono">{b.created_at ? new Date(b.created_at).toLocaleString() : '—'}</td>
-                    <td>{b.vehicle_name || '—'}</td>
+                    <td>{vehicleLabel(b.vehicle_name)}</td>
                     <td className="mono">R{b.total_fare ?? '—'}</td>
-                    <td><span className={'badge badge-' + b.status}>{b.status}</span></td>
+                    <td className="capitalize">{(b.payment_method || '—').replaceAll('_', ' ')}</td>
+                    <td><span className={'badge badge-' + b.status}>{(b.status || '').replaceAll('_', ' ')}</span></td>
                   </tr>
                 ))}
               </tbody>

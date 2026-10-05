@@ -251,3 +251,17 @@ body {
 .kv-row { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--border); font-size: 12.5px; }
 .kv-k { color: var(--text-dim); }
 .kv-v { text-align: right; word-break: break-word; }
+
+
+/* ---------- Status badges used by pages added/aligned in the Supabase alignment pass ---------- */
+.badge-open, .badge-in_progress, .badge-accepted, .badge-loading, .badge-in_transit, .badge-confirmed { background: var(--blu-light); color: var(--blu); }
+.badge-resolved, .badge-delivered, .badge-completed { background: var(--grn-light); color: var(--grn); }
+.badge-closed, .badge-cancelled_rider, .badge-cancelled_driver, .badge-cancelled_customer { background: #E5E7EB; color: #4B5563; }
+
+/* ---------- Sidebar counts + dashboard links ---------- */
+.nav-count { margin-left: auto; min-width: 20px; padding: 1px 7px; border-radius: 20px; font-size: 11px; font-weight: 700; text-align: center; background: rgba(255,255,255,.14); color: #fff; }
+.nav-count-alert { background: var(--acc); }
+.stat-link { text-decoration: none; color: inherit; display: block; }
+.stat-link:hover { border-color: var(--acc); }
+.stat-alert { border-color: var(--red); background: var(--red-light); }
+textarea.cell-input { font-family: inherit; resize: vertical; }
